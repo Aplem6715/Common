@@ -2,6 +2,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using ZLogger;
 
@@ -17,6 +19,19 @@ namespace Aplem.Common
         private Action<T> _instantiateProcessor;
         public Transform _parent { get; private set; }
 
+        // Implementation of IPool
+        public int PoolingCount => _pool.Count;
+        public int ActiveCount => Capacity - PoolingCount;
+        public bool IsPendingDestroy { get; private set; }
+
+        private const int AsyncDestroyPerFrame = 10;
+
+        private int _capacity;
+        public int Capacity
+        {
+            get { return _capacity; }
+            protected set { _capacity = value; Debug.Assert(ActiveCount >= 0); }
+        }
 
         public MonoPool() : this(null, null, 0) { }
         public MonoPool(GameObject motherPref) : this(motherPref, null, 0) { }
@@ -44,7 +59,7 @@ namespace Aplem.Common
             }
         }
 
-        private T Create()
+        protected virtual T Create()
         {
             T comp = GameObject.Instantiate(_motherPref).GetComponent<T>();
             comp.SetPool(this);
@@ -53,11 +68,12 @@ namespace Aplem.Common
             {
                 comp.transform.SetParent(_parent);
             }
+            Capacity++;
             _instantiateProcessor?.Invoke(comp);
             return comp;
         }
 
-        public T Rent()
+        public virtual T Rent()
         {
             T obj;
             if (_pool.Count == 0)
@@ -74,7 +90,7 @@ namespace Aplem.Common
             return obj;
         }
 
-        public void Return(IPoolable obj)
+        public virtual void Return(IPoolable obj)
         {
             T retObj = (T)obj;
             if (retObj is null)
@@ -87,18 +103,56 @@ namespace Aplem.Common
                 retObj.transform.SetParent(_parent);
             }
             retObj.gameObject.SetActive(false);
-            obj.IsPooling = true;
+            obj.IsPooling = true && !IsPendingDestroy;
             retObj.OnReturned();
-            _pool.Push(retObj);
+
+            if (IsPendingDestroy)
+            {
+                GameObject.Destroy(retObj.gameObject);
+                Capacity--;
+            }
+            else
+            {
+                _pool.Push(retObj);
+            }
         }
 
-        public void Clear()
+        public async UniTask DestroyAsync(CancellationToken token)
+        {
+            IsPendingDestroy = true;
+            while (_pool.Count != 0)
+            {
+                if (token.IsCancellationRequested)
+                {
+                    return;
+                }
+
+                for (int i = 0; i < AsyncDestroyPerFrame; i++)
+                {
+                    if (!_pool.TryPop(out T item))
+                    {
+                        break;
+                    }
+                    GameObject.Destroy(item.gameObject);
+                    Capacity--;
+                }
+                await UniTask.DelayFrame(1);
+            }
+
+            await ((IPool)this).WaitUntilReturnAll(token);
+        }
+
+        public void DestroyAllPooled()
         {
             while (_pool.Count > 0)
             {
-                T obj = _pool.Pop();
-                GameObject.Destroy(obj.gameObject);
+                var item = _pool.Pop();
+                if (item?.gameObject != null)
+                {
+                    GameObject.Destroy(item.gameObject);
+                }
             }
         }
+
     }
 }

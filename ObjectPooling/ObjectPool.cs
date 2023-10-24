@@ -1,6 +1,9 @@
 
 
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using ZLogger;
 
 namespace Aplem.Common
@@ -10,24 +13,34 @@ namespace Aplem.Common
     public class ObjectPool<T> : IPool where T : class, IPoolable, new()
     {
         public int PoolingCount => _pool.Count;
-        public int UsingCount => Capacity - PoolingCount;
+        public int ActiveCount => Capacity - PoolingCount;
+        public bool IsPendingDestroy { get; private set; } = false;
 
-        public int Capacity { get; private set; }
+        private int _capacity;
 
         private Stack<T> _pool;
 
+        private int _destroyPerFrame;
+        private const int AsyncDestroyPerFrame = 10;
+
         protected readonly ILogger _logger = LogManager.GetLogger(typeof(ObjectPool<T>).Name);
 
-        public ObjectPool() : this(0) { }
-        public ObjectPool(int capacity)
+        public int Capacity
         {
-            Capacity = capacity;
-            _pool = new Stack<T>(capacity);
+            get { return _capacity; }
+            private set { _capacity = value; Debug.Assert(ActiveCount >= 0); }
+        }
 
+        public ObjectPool() : this(0) { }
+        public ObjectPool(int capacity, int destroyPerFrame = AsyncDestroyPerFrame)
+        {
+            _destroyPerFrame = destroyPerFrame;
+            _pool = new Stack<T>(capacity);
             for (int i = 0; i < capacity; i++)
             {
                 _pool.Push(new T());
             }
+            Capacity = capacity;
         }
 
         public void Warmup(int capacity)
@@ -41,8 +54,8 @@ namespace Aplem.Common
             for (int i = 0; i < gap; i++)
             {
                 _pool.Push(new T());
+                Capacity++;
             }
-            Capacity = capacity;
         }
 
         public T Rent()
@@ -71,14 +84,46 @@ namespace Aplem.Common
                 _logger.ZLogError("returned object is not type of {0}", typeof(T));
             }
 
-            retObj.IsPooling = true;
+            retObj.IsPooling = true && !IsPendingDestroy;
             retObj.OnReturned();
-            _pool.Push(retObj);
+            if (IsPendingDestroy)
+            {
+                Capacity--;
+            }
+            else
+            {
+                _pool.Push(retObj);
+            }
         }
 
-        public void Clear()
+        public async UniTask DestroyAsync(CancellationToken token)
+        {
+            IsPendingDestroy = true;
+            while (_pool.Count != 0)
+            {
+                if (token.IsCancellationRequested)
+                {
+                    return;
+                }
+
+                for (int i = 0; i < _destroyPerFrame; i++)
+                {
+                    if (!_pool.TryPop(out T item))
+                    {
+                        return;
+                    }
+                    Capacity--;
+                }
+                await UniTask.DelayFrame(1);
+            }
+
+            await ((IPool)this).WaitUntilReturnAll(token);
+        }
+
+        public void DestroyAllPooled()
         {
             _pool.Clear();
         }
+
     }
 }
