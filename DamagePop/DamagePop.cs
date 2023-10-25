@@ -19,7 +19,7 @@ namespace Aplem.Common
         [SerializeField]
         private TextMeshPro _text;
 
-        public void Setup(Vector3 pos, int damage)
+        public virtual void Setup(Vector3 pos, int damage)
         {
             transform.position = pos;
             _text.SetText(damage);
@@ -27,7 +27,7 @@ namespace Aplem.Common
             Play().Forget();
         }
 
-        private async UniTask Play()
+        protected virtual async UniTask Play()
         {
             // TODO: 時間・アニメーション
             await UniTask.Delay(1000);
