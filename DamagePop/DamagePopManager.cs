@@ -14,10 +14,13 @@ namespace Aplem.Common
     public class DamagePopManager : SingletonMono<DamagePopManager>
     {
         [SerializeField]
-        private DamagePop[] _prefs;
+        private Vector3 _spawnShift = new Vector3(0, 0.2f, 0);
 
         [SerializeField]
         private int _poolSize = 32;
+
+        [SerializeField]
+        private DamagePop[] _prefs;
 
         private MonoPool<DamagePop>[] _pools;
 
@@ -53,7 +56,7 @@ namespace Aplem.Common
             }
 
             var pop = _pools[styleId].Rent();
-            pop.Setup(pos, damage);
+            pop.Setup(pos + _spawnShift, damage);
         }
     }
 }
