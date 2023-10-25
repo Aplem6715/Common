@@ -8,8 +8,23 @@ namespace Aplem.Common
 {
     public static class LogManager
     {
-        static Microsoft.Extensions.Logging.ILogger globalLogger;
-        static ILoggerFactory loggerFactory;
+        static Microsoft.Extensions.Logging.ILogger _globalLogger;
+        static ILoggerFactory _loggerFactoryInner;
+        static ILoggerFactory _loggerFactory
+        {
+            get
+            {
+                if (_loggerFactoryInner == null)
+                {
+                    Init();
+                }
+                return _loggerFactoryInner;
+            }
+            set
+            {
+                _loggerFactoryInner = value;
+            }
+        }
 
 #if (UNITY_STANDALONE && UNITY_DEBUG)
         static readonly string logFilePath = "log/debuglog.log";
@@ -29,12 +44,13 @@ namespace Aplem.Common
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void Init()
         {
+            Application.quitting -= Quit;
             Application.quitting += Quit;
 
             // Standard LoggerFactory does not work on IL2CPP,
             // But you can use ZLogger's UnityLoggerFactory instead,
             // it works on IL2CPP, all platforms(includes mobile).
-            loggerFactory = UnityLoggerFactory.Create(builder =>
+            _loggerFactory = UnityLoggerFactory.Create(builder =>
             {
 
                 builder.ClearProviders();
@@ -64,19 +80,19 @@ namespace Aplem.Common
                 // and other configuration(AddFileLog, etc...)
             });
 
-            globalLogger = loggerFactory.CreateLogger("Global");
+            _globalLogger = _loggerFactory.CreateLogger("Global");
         }
 
         public static void Quit()
         {
             // when quit, flush unfinished log entries.
-            loggerFactory.Dispose();
-            loggerFactory = null;
+            _loggerFactory.Dispose();
+            _loggerFactory = null;
         }
 
-        public static Microsoft.Extensions.Logging.ILogger Logger => globalLogger;
+        public static Microsoft.Extensions.Logging.ILogger Logger => _globalLogger;
 
-        public static ILogger<T> GetLogger<T>() where T : class => loggerFactory.CreateLogger<T>();
-        public static Microsoft.Extensions.Logging.ILogger GetLogger(string categoryName) => loggerFactory.CreateLogger(categoryName);
+        public static ILogger<T> GetLogger<T>() where T : class => _loggerFactory.CreateLogger<T>();
+        public static Microsoft.Extensions.Logging.ILogger GetLogger(string categoryName) => _loggerFactory.CreateLogger(categoryName);
     }
 }
