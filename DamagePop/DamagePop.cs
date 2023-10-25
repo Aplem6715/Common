@@ -17,7 +17,7 @@ namespace Aplem.Common
     public class DamagePop : MonoBehaviour, IPoolableMono
     {
         [SerializeField]
-        private TextMeshProUGUI _text;
+        private TextMeshPro _text;
 
         public void Setup(Vector3 pos, int damage)
         {
