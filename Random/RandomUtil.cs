@@ -11,6 +11,8 @@ namespace Aplem.Common
     {
         private Random _seedRand = new Random((uint)Environment.TickCount);
 
+        public static ref Random GlobalRand => ref Inst._seedRand;
+
         public override void Reset()
         {
             _seedRand = new Random((uint)Environment.TickCount);
