@@ -4,6 +4,7 @@ using Sirenix.OdinInspector;
 using UnityEngine;
 using ZLogger;
 using Aplem.Common;
+using Cysharp.Threading.Tasks;
 
 
 namespace Aplem.Common
@@ -56,7 +57,7 @@ namespace Aplem.Common
             }
 
             var pop = _pools[styleId].Rent();
-            pop.Setup(pos + _spawnShift, damage);
+            pop.Open(pos + _spawnShift, damage).Forget();
         }
     }
 }

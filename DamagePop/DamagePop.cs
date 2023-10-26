@@ -19,20 +19,17 @@ namespace Aplem.Common
         [SerializeField]
         protected TextMeshPro _text;
 
-        public virtual void Setup(Vector3 pos, int damage)
+        public virtual async UniTask Open(Vector3 pos, int damage)
         {
             transform.position = pos;
             _text.SetText(damage);
 
-            Play().Forget();
-        }
+            await Play();
 
-        protected virtual async UniTask Play()
-        {
-            // TODO: 時間・アニメーション
-            await UniTask.Delay(1000);
             ((IPoolable)this).Return();
         }
+
+        protected virtual UniTask Play() { return UniTask.CompletedTask; }
 
 
         /* implementation of IPoolableMono */
