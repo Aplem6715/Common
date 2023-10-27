@@ -17,7 +17,10 @@ namespace Aplem.Common
     public class DamagePop : MonoBehaviour, IPoolableMono
     {
         [SerializeField]
-        protected TextMeshPro _text;
+        protected TextMeshProUGUI _text;
+
+        [SerializeField]
+        protected CanvasGroup _canvas;
 
         public virtual async UniTask Open(Vector3 pos, int damage)
         {
