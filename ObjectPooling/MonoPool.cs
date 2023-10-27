@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using NUnit.Framework;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using ZLogger;
 
@@ -20,17 +22,25 @@ namespace Aplem.Common
         public Transform _parent { get; private set; }
 
         // Implementation of IPool
+        [ShowInInspector]
         public int PoolingCount => _pool.Count;
+        [ShowInInspector]
         public int ActiveCount => Capacity - PoolingCount;
+
         public bool IsPendingDestroy { get; private set; }
 
         private const int AsyncDestroyPerFrame = 10;
 
+        [ShowInInspector]
         private int _capacity;
         public int Capacity
         {
             get { return _capacity; }
-            protected set { _capacity = value; Debug.Assert(ActiveCount >= 0); }
+            protected set
+            {
+                _capacity = value;
+                Debug.Assert(ActiveCount >= 0);
+            }
         }
 
         public MonoPool() : this(null, null, 0) { }
@@ -69,6 +79,7 @@ namespace Aplem.Common
                 comp.transform.SetParent(_parent);
             }
             Capacity++;
+            comp.gameObject.name = $"{_motherPref.name}_{Capacity}";
             _instantiateProcessor?.Invoke(comp);
             return comp;
         }
@@ -93,6 +104,7 @@ namespace Aplem.Common
         public virtual void Return(IPoolable obj)
         {
             T retObj = (T)obj;
+
             if (retObj is null)
             {
                 _logger.ZLogError("returned object is not type of {0}", typeof(T));
@@ -113,6 +125,12 @@ namespace Aplem.Common
             }
             else
             {
+#if DEBUG
+                if (_pool.Contains(retObj))
+                {
+                    Debug.LogError("重複Return", retObj.gameObject);
+                }
+#endif
                 _pool.Push(retObj);
             }
         }
@@ -153,6 +171,5 @@ namespace Aplem.Common
                 }
             }
         }
-
     }
 }

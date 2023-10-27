@@ -35,7 +35,7 @@ namespace Aplem.Common
         {
             foreach (var weak in _all)
             {
-                if (weak.TryGetTarget(out T comp) && comp.gameObject != null)
+                if (weak.TryGetTarget(out T comp) && comp != null && comp.gameObject != null)
                 {
                     GameObject.Destroy(comp.gameObject);
                 }
