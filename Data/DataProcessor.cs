@@ -6,7 +6,7 @@ using System.IO.Compression;
 using System.Security.Cryptography;
 using Aplem.Common;
 using Cysharp.Threading.Tasks;
-using MessagePack;
+using MemoryPack;
 using UnityEngine;
 using ZLogger;
 
@@ -51,8 +51,8 @@ namespace Aplem.Data
             byte[] data = new byte[raw.Length - 1];
             Buffer.BlockCopy(raw, 1, data, 0, raw.Length - 1);
 
-            bool isEncrypted = (header & EncryptFlagBit) == 1;
-            bool isCompressed = (header & CompressFlagBit) == 1;
+            bool isEncrypted = (header & EncryptFlagBit) != 0;
+            bool isCompressed = (header & CompressFlagBit) != 0;
 
             try
             {
@@ -113,16 +113,23 @@ namespace Aplem.Data
             byte[] bufferKey = deriveBytes.GetBytes(BufferKeySize); // Convert 32 bytes of salt to password
             rij.Key = bufferKey;
 
-            using CryptoStream cryptoStream = new CryptoStream(stream,
-                                                               rij.CreateDecryptor(rij.Key, rij.IV),
-                                                               CryptoStreamMode.Read);
+            byte[] decrypted;
+            using (var cryptoStream = new CryptoStream(stream, rij.CreateDecryptor(rij.Key, rij.IV), CryptoStreamMode.Read))
+            {
+                using (var output = new MemoryStream())
+                {
+                    cryptoStream.CopyTo(output);
+                    decrypted = output.ToArray();
+                }
+            }
+
             if (useCompress)
             {
-                return await RestoreCompressedData<T>(cryptoStream);
+                return await RestoreCompressedData<T>(decrypted);
             }
             else
             {
-                return await RestorePlainData<T>(cryptoStream);
+                return await RestorePlainData<T>(decrypted);
             }
         }
 
@@ -156,7 +163,7 @@ namespace Aplem.Data
 
         public static async UniTask<T> RestorePlainData<T>(Stream stream) where T : class
         {
-            return await MessagePackSerializer.DeserializeAsync<T>(stream);
+            return await MemoryPackSerializer.DeserializeAsync<T>(stream);
         }
 #pragma warning restore CS0162
     }
