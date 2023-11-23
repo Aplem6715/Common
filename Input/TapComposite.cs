@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Layouts;
 using System.Collections.Generic;
 using System.ComponentModel;
+using UnityEditor;
 
 #if UNITY_EDITOR
 using UnityEditor;
