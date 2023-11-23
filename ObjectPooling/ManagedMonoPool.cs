@@ -5,11 +5,11 @@ using UnityEngine;
 using ZLogger;
 using Aplem.Common;
 using System;
+using Object = UnityEngine.Object;
 
 
 namespace Aplem.Common
 {
-
     using ILogger = Microsoft.Extensions.Logging.ILogger;
 
     public interface IManagedPool : IPool
@@ -21,25 +21,33 @@ namespace Aplem.Common
     {
         private List<WeakReference<T>> _all;
 
-        public ManagedMonoPool() : this(null, null, 0) { }
-        public ManagedMonoPool(GameObject motherPref) : this(motherPref, null, 0) { }
-        public ManagedMonoPool(GameObject motherPref, int capacity) : this(motherPref, null, capacity) { }
-        public ManagedMonoPool(GameObject motherPref, Transform parent) : this(motherPref, parent, 0) { }
+        public ManagedMonoPool() : this(null, null, 0)
+        {
+        }
 
-        public ManagedMonoPool(GameObject motherPref, Transform parent, int capacity, Action<T> onInstantiateProcessor = null)
-        : base(motherPref, parent, capacity, onInstantiateProcessor)
+        public ManagedMonoPool(GameObject motherPref) : this(motherPref, null, 0)
+        {
+        }
+
+        public ManagedMonoPool(GameObject motherPref, int capacity) : this(motherPref, null, capacity)
+        {
+        }
+
+        public ManagedMonoPool(GameObject motherPref, Transform parent) : this(motherPref, parent, 0)
+        {
+        }
+
+        public ManagedMonoPool(GameObject motherPref, Transform parent, int capacity,
+            Action<T> onInstantiateProcessor = null)
+            : base(motherPref, parent, capacity, onInstantiateProcessor)
         {
         }
 
         public void DestroyAll()
         {
             foreach (var weak in _all)
-            {
-                if (weak.TryGetTarget(out T comp) && comp != null && comp.gameObject != null)
-                {
-                    GameObject.Destroy(comp.gameObject);
-                }
-            }
+                if (weak.TryGetTarget(out var comp) && comp != null && comp.gameObject != null)
+                    Object.Destroy(comp.gameObject);
             _all.Clear();
             DestroyAllPooled();
             Capacity = 0;
@@ -49,9 +57,7 @@ namespace Aplem.Common
         {
             var created = base.Create();
             if (_all == null)
-            {
                 _all = new List<WeakReference<T>>(Capacity);
-            }
 
             _all.Add(new WeakReference<T>(created));
             return created;

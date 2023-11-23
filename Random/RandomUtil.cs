@@ -9,7 +9,7 @@ namespace Aplem.Common
 
     public class RandomUtil : Singleton<RandomUtil>
     {
-        private Random _seedRand = new Random((uint)Environment.TickCount);
+        private Random _seedRand = new((uint)Environment.TickCount);
 
         public static ref Random GlobalRand => ref Inst._seedRand;
 

@@ -1,5 +1,3 @@
-
-
 using UnityEngine;
 
 namespace Aplem.Common
@@ -10,10 +8,12 @@ namespace Aplem.Common
         IPool _pool { get; set; }
         void OnRent();
         void OnReturned();
+
         void SetPool(IPool pool)
         {
             _pool = pool;
         }
+
         bool Return()
         {
             if (_pool == null)
@@ -21,6 +21,7 @@ namespace Aplem.Common
                 Debug.LogError("Pool is null");
                 return false;
             }
+
             _pool.Return(this);
             return true;
         }

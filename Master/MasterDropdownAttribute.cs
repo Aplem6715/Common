@@ -7,7 +7,6 @@ using ZLogger;
 
 namespace Aplem.Common
 {
-
     public class MasterDropdownAttribute : ValueDropdownAttribute
     {
         public Type MasterType;
@@ -19,5 +18,4 @@ namespace Aplem.Common
             Folder = folder;
         }
     }
-
 }

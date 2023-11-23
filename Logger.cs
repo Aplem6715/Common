@@ -8,22 +8,18 @@ namespace Aplem.Common
 {
     public static class LogManager
     {
-        static Microsoft.Extensions.Logging.ILogger _globalLogger;
-        static ILoggerFactory _loggerFactoryInner;
-        static ILoggerFactory _loggerFactory
+        private static Microsoft.Extensions.Logging.ILogger _globalLogger;
+        private static ILoggerFactory _loggerFactoryInner;
+
+        private static ILoggerFactory _loggerFactory
         {
             get
             {
                 if (_loggerFactoryInner == null)
-                {
                     Init();
-                }
                 return _loggerFactoryInner;
             }
-            set
-            {
-                _loggerFactoryInner = value;
-            }
+            set => _loggerFactoryInner = value;
         }
 
 #if (UNITY_STANDALONE && UNITY_DEBUG)
@@ -36,7 +32,7 @@ namespace Aplem.Common
         }
 
         [RuntimeInitializeOnLoadMethod]
-        static void Reload()
+        private static void Reload()
         {
             Application.quitting -= Quit;
         }
@@ -52,7 +48,6 @@ namespace Aplem.Common
             // it works on IL2CPP, all platforms(includes mobile).
             _loggerFactory = UnityLoggerFactory.Create(builder =>
             {
-
                 builder.ClearProviders();
 
                 // or more configuration, you can use builder.AddFilter
@@ -62,7 +57,8 @@ namespace Aplem.Common
                 File.Delete(logFilePath);
                 builder.AddZLoggerFile(logFilePath, options => {
                     options.EnableStructuredLogging = false;
-                    options.PrefixFormatter = (writer, info) => ZString.Utf8Format(writer, "{0} 【{1}】 ", info.Timestamp.LocalDateTime, info.CategoryName);
+                    options.PrefixFormatter =
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                (writer, info) => ZString.Utf8Format(writer, "{0} 【{1}】 ", info.Timestamp.LocalDateTime, info.CategoryName);
                 });
 #endif
 
@@ -74,7 +70,8 @@ namespace Aplem.Common
                 // * Error with Exception -> LogException
                 builder.AddZLoggerUnityDebug(options =>
                 {
-                    options.PrefixFormatter = (writer, info) => ZString.Utf8Format(writer, "【{0}】 ", info.CategoryName);
+                    options.PrefixFormatter = (writer, info) =>
+                        ZString.Utf8Format(writer, "【{0}】 ", info.CategoryName);
                 });
 
                 // and other configuration(AddFileLog, etc...)
@@ -92,7 +89,14 @@ namespace Aplem.Common
 
         public static Microsoft.Extensions.Logging.ILogger Logger => _globalLogger;
 
-        public static ILogger<T> GetLogger<T>() where T : class => _loggerFactory.CreateLogger<T>();
-        public static Microsoft.Extensions.Logging.ILogger GetLogger(string categoryName) => _loggerFactory.CreateLogger(categoryName);
+        public static ILogger<T> GetLogger<T>() where T : class
+        {
+            return _loggerFactory.CreateLogger<T>();
+        }
+
+        public static Microsoft.Extensions.Logging.ILogger GetLogger(string categoryName)
+        {
+            return _loggerFactory.CreateLogger(categoryName);
+        }
     }
 }

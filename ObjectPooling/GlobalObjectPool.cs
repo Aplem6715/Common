@@ -1,17 +1,9 @@
-﻿
-
-namespace Aplem.Common
+﻿namespace Aplem.Common
 {
     public class GlobalPool<T> where T : class, IPoolable, new()
     {
-        private static readonly ObjectPool<T> _instance = new ObjectPool<T>();
+        private static readonly ObjectPool<T> _instance = new();
 
-        public static ObjectPool<T> Inst
-        {
-            get
-            {
-                return _instance;
-            }
-        }
+        public static ObjectPool<T> Inst => _instance;
     }
 }

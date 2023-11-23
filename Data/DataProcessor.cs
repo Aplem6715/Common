@@ -16,7 +16,8 @@ namespace Aplem.Data
 
     public static class AddressablesConstants
     {
-        public static readonly string MasterKey = new byte[] {
+        public static readonly string MasterKey = new byte[]
+        {
             0x92, 0x62, 0xB1, 0x91,
             0xF5, 0x07, 0x46, 0xF9,
             0xF6, 0x9E, 0xB0, 0x90,
@@ -47,27 +48,21 @@ namespace Aplem.Data
 #pragma warning disable CS0162
         public static async UniTask<T> RestoreData<T>(byte[] raw) where T : class
         {
-            byte header = raw[0];
-            byte[] data = new byte[raw.Length - 1];
+            var header = raw[0];
+            var data = new byte[raw.Length - 1];
             Buffer.BlockCopy(raw, 1, data, 0, raw.Length - 1);
 
-            bool isEncrypted = (header & EncryptFlagBit) != 0;
-            bool isCompressed = (header & CompressFlagBit) != 0;
+            var isEncrypted = (header & EncryptFlagBit) != 0;
+            var isCompressed = (header & CompressFlagBit) != 0;
 
             try
             {
                 if (isEncrypted)
-                {
                     return await RestoreEncryptedData<T>(data, isCompressed);
-                }
                 else if (isCompressed)
-                {
                     return await RestoreCompressedData<T>(data);
-                }
                 else
-                {
                     return await RestorePlainData<T>(data);
-                }
             }
             catch (Exception e)
             {
@@ -84,7 +79,7 @@ namespace Aplem.Data
 
         public static async UniTask<T> RestoreEncryptedData<T>(Stream stream, bool useCompress) where T : class
         {
-            RijndaelManaged rij = new RijndaelManaged
+            var rij = new RijndaelManaged
             {
                 BlockSize = BlockSize,
                 KeySize = KeySize,
@@ -93,28 +88,25 @@ namespace Aplem.Data
             };
 
             // First 32 bytes are salt.
-            byte[] salt = new byte[BufferKeySize];
-            int nbRead = stream.Read(salt, 0, salt.Length);
+            var salt = new byte[BufferKeySize];
+            var nbRead = stream.Read(salt, 0, salt.Length);
             if (nbRead != salt.Length)
-            {
                 return null;
-            }
 
             // Second 32 bytes are IV.
-            byte[] iv = new byte[BufferKeySize];
+            var iv = new byte[BufferKeySize];
             nbRead = stream.Read(iv, 0, BufferKeySize);
             if (nbRead != BufferKeySize)
-            {
                 return null;
-            }
             rij.IV = iv;
 
-            Rfc2898DeriveBytes deriveBytes = new Rfc2898DeriveBytes(AddressablesConstants.MasterKey, salt);
-            byte[] bufferKey = deriveBytes.GetBytes(BufferKeySize); // Convert 32 bytes of salt to password
+            var deriveBytes = new Rfc2898DeriveBytes(AddressablesConstants.MasterKey, salt);
+            var bufferKey = deriveBytes.GetBytes(BufferKeySize); // Convert 32 bytes of salt to password
             rij.Key = bufferKey;
 
             byte[] decrypted;
-            using (var cryptoStream = new CryptoStream(stream, rij.CreateDecryptor(rij.Key, rij.IV), CryptoStreamMode.Read))
+            using (var cryptoStream =
+                   new CryptoStream(stream, rij.CreateDecryptor(rij.Key, rij.IV), CryptoStreamMode.Read))
             {
                 using (var output = new MemoryStream())
                 {
@@ -124,13 +116,9 @@ namespace Aplem.Data
             }
 
             if (useCompress)
-            {
                 return await RestoreCompressedData<T>(decrypted);
-            }
             else
-            {
                 return await RestorePlainData<T>(decrypted);
-            }
         }
 
         /// <summary>

@@ -8,7 +8,6 @@ using UnityEngine.InputSystem.Controls;
 
 namespace Aplem.Common
 {
-
     using ILogger = Microsoft.Extensions.Logging.ILogger;
 
     public class AplemDragInteraction : IInputInteraction
@@ -38,22 +37,16 @@ namespace Aplem.Common
                     break;
                 case InputActionPhase.Waiting:
                     if (((ButtonControl)context.action.controls[0]).isPressed)
-                    {
                         context.Started();
-                    }
                     break;
                 case InputActionPhase.Started:
                     context.PerformedAndStayPerformed();
                     break;
                 case InputActionPhase.Performed:
                     if (((ButtonControl)context.action.controls[0]).isPressed)
-                    {
                         context.PerformedAndStayPerformed();
-                    }
                     else
-                    {
                         context.Canceled();
-                    }
                     break;
                 case InputActionPhase.Canceled:
                     break;

@@ -9,7 +9,6 @@ namespace Aplem.Common
 
     public static class RandomExtension
     {
-
         public delegate float GetWeightFunc<T>(T item);
 
         /// <summary>
@@ -31,10 +30,8 @@ namespace Aplem.Common
         {
             // 0~1の一様分布を12回重ねると分散が1(=偏差も1)になる
             float ret = 0;
-            for (int i = 0; i < 12; i++)
-            {
+            for (var i = 0; i < 12; i++)
                 ret += rand.NextFloat();
-            }
             return (ret - 6) * std + mean;
         }
 
@@ -55,7 +52,7 @@ namespace Aplem.Common
         /// <returns>丸めた値</returns>
         public static int Round(this ref Random rand, float value)
         {
-            float frac = math.frac(value);
+            var frac = math.frac(value);
             return (int)value + (rand.NextFloat() > frac ? 0 : 1);
         }
 
@@ -65,9 +62,9 @@ namespace Aplem.Common
         /// <param name="array">シャッフルする配列</param>
         public static void Shuffle<T>(this ref Random rand, ref T[] array)
         {
-            for (int i = array.Length - 1; i > 0; i--)
+            for (var i = array.Length - 1; i > 0; i--)
             {
-                int j = rand.NextInt(i + 1);
+                var j = rand.NextInt(i + 1);
                 var temp = array[i];
                 array[i] = array[j];
                 array[j] = temp;
@@ -82,20 +79,17 @@ namespace Aplem.Common
         {
             float sum = 0;
             foreach (var weight in weights)
-            {
                 sum += weight;
-            }
 
-            float rand = random.NextFloat(sum);
+            var rand = random.NextFloat(sum);
             sum = 0;
-            for (int i = 0; i < weights.Count; i++)
+            for (var i = 0; i < weights.Count; i++)
             {
                 sum += weights[i];
                 if (rand < sum)
-                {
                     return i;
-                }
             }
+
             throw new InvalidOperationException("Unreachable");
         }
 
@@ -109,20 +103,17 @@ namespace Aplem.Common
         {
             float sum = 0;
             foreach (var item in array)
-            {
                 sum += GetWeight(item);
-            }
 
-            float rand = random.NextFloat(sum);
+            var rand = random.NextFloat(sum);
             sum = 0;
-            for (int i = 0; i < array.Count; i++)
+            for (var i = 0; i < array.Count; i++)
             {
                 sum += GetWeight(array[i]);
                 if (rand < sum)
-                {
                     return i;
-                }
             }
+
             throw new InvalidOperationException("Unreachable");
         }
 
@@ -132,24 +123,22 @@ namespace Aplem.Common
         /// <param name="dict">辞書</param>
         /// <param name="GetWeight">辞書のPairから重みを取得する関数</param>
         /// <returns>選択されたValue</returns>
-        public static V ChoiceWeighted<K, V>(this ref Random random, IReadOnlyDictionary<K, V> dict, GetWeightFunc<KeyValuePair<K, V>> GetWeight)
+        public static V ChoiceWeighted<K, V>(this ref Random random, IReadOnlyDictionary<K, V> dict,
+            GetWeightFunc<KeyValuePair<K, V>> GetWeight)
         {
             float sum = 0;
             foreach (var pair in dict)
-            {
                 sum += GetWeight(pair);
-            }
 
-            float rand = random.NextFloat(sum);
+            var rand = random.NextFloat(sum);
             sum = 0;
             foreach (var pair in dict)
             {
                 sum += GetWeight(pair);
                 if (rand < sum)
-                {
                     return pair.Value;
-                }
             }
+
             throw new InvalidOperationException("Unreachable");
         }
 
@@ -163,20 +152,17 @@ namespace Aplem.Common
         {
             float sum = 0;
             foreach (var pair in weights)
-            {
                 sum += pair.Value;
-            }
 
-            float rand = random.NextFloat(sum);
+            var rand = random.NextFloat(sum);
             sum = 0;
             foreach (var pair in weights)
             {
                 sum += pair.Value;
                 if (rand < sum)
-                {
                     return pair.Key;
-                }
             }
+
             throw new InvalidOperationException("Unreachable");
         }
 
@@ -188,8 +174,8 @@ namespace Aplem.Common
         /// <param name="maxPerItem">要素ごとの最大値</param>
         public static void FillDistribute(this ref Random rand, ref int[] result, int sum, int maxPerItem)
         {
-            int remain = sum;
-            int numItems = result.Length;
+            var remain = sum;
+            var numItems = result.Length;
 
             // for (int i = 0; i < numItems - 1; i++)
             // {
@@ -220,10 +206,8 @@ namespace Aplem.Common
 
             // result[numItems - 1] = remain;
 
-            for (int i = 0; i < numItems; i++)
-            {
-                result[i] = math.clamp(rand.Round(rand.NextNormal(sum/(float)result.Length, 0.2f)), 0, maxPerItem);
-            }
+            for (var i = 0; i < numItems; i++)
+                result[i] = math.clamp(rand.Round(rand.NextNormal(sum / (float)result.Length, 0.2f)), 0, maxPerItem);
 
             rand.Shuffle(ref result);
         }

@@ -6,7 +6,6 @@ using Aplem.Common;
 
 namespace Aplem.Common
 {
-
     public class PoolTestObj : MonoBehaviour, IPoolableMono
     {
         public bool IsPooling { get; set; }

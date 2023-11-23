@@ -3,12 +3,10 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Layouts;
 using UnityEngine.InputSystem.LowLevel;
-
 using System.Collections.Generic;
 
 namespace Aplem.Common
 {
-
     public class TouchDeltaMagnitudeComparer : IComparer<TouchState>
     {
         public int Compare(TouchState x, TouchState y)
@@ -35,7 +33,7 @@ namespace Aplem.Common
 #if UNITY_EDITOR
         [UnityEditor.InitializeOnLoadMethod]
 #else
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
 #endif
         private static void Initialize()
         {

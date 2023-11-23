@@ -1,5 +1,3 @@
-
-
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -8,6 +6,7 @@ using NUnit.Framework;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using ZLogger;
+using Object = UnityEngine.Object;
 
 namespace Aplem.Common
 {
@@ -22,20 +21,18 @@ namespace Aplem.Common
         public Transform _parent { get; private set; }
 
         // Implementation of IPool
-        [ShowInInspector]
-        public int PoolingCount => _pool.Count;
-        [ShowInInspector]
-        public int ActiveCount => Capacity - PoolingCount;
+        [ShowInInspector] public int PoolingCount => _pool.Count;
+        [ShowInInspector] public int ActiveCount => Capacity - PoolingCount;
 
         public bool IsPendingDestroy { get; private set; }
 
         private const int AsyncDestroyPerFrame = 10;
 
-        [ShowInInspector]
-        private int _capacity;
+        [ShowInInspector] private int _capacity;
+
         public int Capacity
         {
-            get { return _capacity; }
+            get => _capacity;
             protected set
             {
                 _capacity = value;
@@ -43,14 +40,25 @@ namespace Aplem.Common
             }
         }
 
-        public MonoPool() : this(null, null, 0) { }
-        public MonoPool(GameObject motherPref) : this(motherPref, null, 0) { }
-        public MonoPool(GameObject motherPref, int capacity) : this(motherPref, null, capacity) { }
-        public MonoPool(GameObject motherPref, Transform parent) : this(motherPref, parent, 0) { }
+        public MonoPool() : this(null, null, 0)
+        {
+        }
+
+        public MonoPool(GameObject motherPref) : this(motherPref, null, 0)
+        {
+        }
+
+        public MonoPool(GameObject motherPref, int capacity) : this(motherPref, null, capacity)
+        {
+        }
+
+        public MonoPool(GameObject motherPref, Transform parent) : this(motherPref, parent, 0)
+        {
+        }
 
         public MonoPool(GameObject motherPref, Transform parent, int capacity, Action<T> onInstantiateProcessor = null)
         {
-            bool hasComponent = motherPref.TryGetComponent<T>(out _);
+            var hasComponent = motherPref.TryGetComponent<T>(out _);
             if (motherPref == null || !hasComponent)
             {
                 _logger.ZLogWarning($"MotherPref Don't have Component:{typeof(T)}");
@@ -62,22 +70,20 @@ namespace Aplem.Common
             _parent = parent;
             _pool = new Stack<T>(capacity);
 
-            for (int i = 0; i < capacity; i++)
+            for (var i = 0; i < capacity; i++)
             {
-                T comp = Create();
+                var comp = Create();
                 _pool.Push(comp);
             }
         }
 
         protected virtual T Create()
         {
-            T comp = GameObject.Instantiate(_motherPref).GetComponent<T>();
+            var comp = Object.Instantiate(_motherPref).GetComponent<T>();
             comp.SetPool(this);
             comp.gameObject.SetActive(false);
             if (_parent)
-            {
                 comp.transform.SetParent(_parent);
-            }
             Capacity++;
             comp.gameObject.name = $"{_motherPref.name}_{Capacity}";
             _instantiateProcessor?.Invoke(comp);
@@ -88,13 +94,9 @@ namespace Aplem.Common
         {
             T obj;
             if (_pool.Count == 0)
-            {
                 obj = Create();
-            }
             else
-            {
                 obj = _pool.Pop();
-            }
             obj.IsPooling = false;
             obj.OnRent();
             obj.gameObject.SetActive(true);
@@ -103,33 +105,27 @@ namespace Aplem.Common
 
         public virtual void Return(IPoolable obj)
         {
-            T retObj = (T)obj;
+            var retObj = (T)obj;
 
             if (retObj is null)
-            {
                 _logger.ZLogError("returned object is not type of {0}", typeof(T));
-            }
 
             if (_parent)
-            {
                 retObj.transform.SetParent(_parent);
-            }
             retObj.gameObject.SetActive(false);
             obj.IsPooling = true && !IsPendingDestroy;
             retObj.OnReturned();
 
             if (IsPendingDestroy)
             {
-                GameObject.Destroy(retObj.gameObject);
+                Object.Destroy(retObj.gameObject);
                 Capacity--;
             }
             else
             {
 #if DEBUG
                 if (_pool.Contains(retObj))
-                {
                     Debug.LogError("重複Return", retObj.gameObject);
-                }
 #endif
                 _pool.Push(retObj);
             }
@@ -141,19 +137,16 @@ namespace Aplem.Common
             while (_pool.Count != 0)
             {
                 if (token.IsCancellationRequested)
-                {
                     return;
-                }
 
-                for (int i = 0; i < AsyncDestroyPerFrame; i++)
+                for (var i = 0; i < AsyncDestroyPerFrame; i++)
                 {
-                    if (!_pool.TryPop(out T item))
-                    {
+                    if (!_pool.TryPop(out var item))
                         break;
-                    }
-                    GameObject.Destroy(item.gameObject);
+                    Object.Destroy(item.gameObject);
                     Capacity--;
                 }
+
                 await UniTask.DelayFrame(1);
             }
 
@@ -166,9 +159,7 @@ namespace Aplem.Common
             {
                 var item = _pool.Pop();
                 if (item?.gameObject != null)
-                {
-                    GameObject.Destroy(item.gameObject);
-                }
+                    Object.Destroy(item.gameObject);
             }
         }
     }

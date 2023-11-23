@@ -11,16 +11,13 @@ using Cysharp.Threading.Tasks;
 
 namespace Aplem.Common
 {
-
     using ILogger = Microsoft.Extensions.Logging.ILogger;
 
     public class DamagePop : MonoBehaviour, IPoolableMono
     {
-        [SerializeField]
-        protected TextMeshProUGUI _text;
+        [SerializeField] protected TextMeshProUGUI _text;
 
-        [SerializeField]
-        protected CanvasGroup _canvas;
+        [SerializeField] protected CanvasGroup _canvas;
 
         public virtual async UniTask Open(Vector3 pos, int damage)
         {
@@ -32,7 +29,10 @@ namespace Aplem.Common
             ((IPoolable)this).Return();
         }
 
-        protected virtual UniTask Play() { return UniTask.CompletedTask; }
+        protected virtual UniTask Play()
+        {
+            return UniTask.CompletedTask;
+        }
 
 
         /* implementation of IPoolableMono */

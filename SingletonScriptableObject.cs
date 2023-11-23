@@ -1,4 +1,3 @@
-
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -19,9 +18,7 @@ namespace Aplem.Common
             get
             {
                 if (_instance == null)
-                {
                     _logger.ZLogError("Not Initialized");
-                }
                 return _instance;
             }
         }
@@ -29,9 +26,7 @@ namespace Aplem.Common
         public static async UniTask Init(string address, CancellationToken token)
         {
             if (_instance != null)
-            {
                 return;
-            }
             _instance = await Addressables.LoadAssetAsync<T>(address).WithCancellation(token);
         }
 

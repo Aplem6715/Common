@@ -1,18 +1,18 @@
 {
-    "name": "Aplem.Common.Editor",
-    "rootNamespace": "",
-    "references": [
-        "GUID:6a827fc6980ab1440999a6457214852f"
-    ],
-    "includePlatforms": [
-        "Editor"
-    ],
-    "excludePlatforms": [],
-    "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
-    "autoReferenced": false,
-    "defineConstraints": [],
-    "versionDefines": [],
-    "noEngineReferences": false
+  "name": "Aplem.Common.Editor",
+  "rootNamespace": "",
+  "references": [
+    "GUID:6a827fc6980ab1440999a6457214852f"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
 }

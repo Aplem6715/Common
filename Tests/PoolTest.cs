@@ -18,6 +18,7 @@ namespace Aplem.Common
         {
             // Use the Assert class to test conditions
         }
+
         // A UnityTest behaves like a coroutine in Play Mode. In Edit Mode you can use
         // `yield return null;` to skip a frame.
         [UnityTest]
@@ -45,11 +46,12 @@ namespace Aplem.Common
             Assert.IsTrue(pool.PoolingCount == 0);
 
             // 返却テスト
-            for (int i = 0; i < 3; i++)
+            for (var i = 0; i < 3; i++)
             {
                 var obj = rents.Pop();
                 ((IPoolableMono)obj).Return();
             }
+
             Assert.IsTrue(pool.ActiveCount == rents.Count);
             Assert.IsTrue(pool.Capacity == 7);
             Assert.IsTrue(pool.PoolingCount == 3);

@@ -8,7 +8,6 @@ using UnityEngine.InputSystem.Controls;
 
 namespace Aplem.Common
 {
-
     using ILogger = Microsoft.Extensions.Logging.ILogger;
 
     public class AplemTapInteraction : IInputInteraction
@@ -23,10 +22,10 @@ namespace Aplem.Common
         private Vector2 _startPos;
         private float _distSqr;
 
-        enum State
+        private enum State
         {
             Idle,
-            Interacting,
+            Interacting
         }
 
 #if UNITY_EDITOR
@@ -58,6 +57,7 @@ namespace Aplem.Common
                         context.SetTimeout(_tapTime);
                         _state = State.Interacting;
                     }
+
                     break;
                 case State.Interacting:
                     if (!((ButtonControl)context.action.controls[0]).isPressed)
@@ -71,6 +71,7 @@ namespace Aplem.Common
                             _state = State.Idle;
                         }
                     }
+
                     break;
                 default:
                     Debug.LogError("Invalid Tap State");

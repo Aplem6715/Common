@@ -1,5 +1,3 @@
-
-
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
@@ -27,31 +25,34 @@ namespace Aplem.Common
 
         public int Capacity
         {
-            get { return _capacity; }
-            private set { _capacity = value; Debug.Assert(ActiveCount >= 0); }
+            get => _capacity;
+            private set
+            {
+                _capacity = value;
+                Debug.Assert(ActiveCount >= 0);
+            }
         }
 
-        public ObjectPool() : this(0) { }
+        public ObjectPool() : this(0)
+        {
+        }
+
         public ObjectPool(int capacity, int destroyPerFrame = AsyncDestroyPerFrame)
         {
             _destroyPerFrame = destroyPerFrame;
             _pool = new Stack<T>(capacity);
-            for (int i = 0; i < capacity; i++)
-            {
+            for (var i = 0; i < capacity; i++)
                 _pool.Push(new T());
-            }
             Capacity = capacity;
         }
 
         public void Warmup(int capacity)
         {
-            int gap = capacity - Capacity;
+            var gap = capacity - Capacity;
             if (gap <= 0)
-            {
                 return;
-            }
 
-            for (int i = 0; i < gap; i++)
+            for (var i = 0; i < gap; i++)
             {
                 _pool.Push(new T());
                 Capacity++;
@@ -70,6 +71,7 @@ namespace Aplem.Common
             {
                 obj = _pool.Pop();
             }
+
             obj.IsPooling = false;
             obj.SetPool(this);
             obj.OnRent();
@@ -78,22 +80,16 @@ namespace Aplem.Common
 
         public void Return(IPoolable obj)
         {
-            T retObj = obj as T;
+            var retObj = obj as T;
             if (retObj is null)
-            {
                 _logger.ZLogError("returned object is not type of {0}", typeof(T));
-            }
 
             retObj.IsPooling = true && !IsPendingDestroy;
             retObj.OnReturned();
             if (IsPendingDestroy)
-            {
                 Capacity--;
-            }
             else
-            {
                 _pool.Push(retObj);
-            }
         }
 
         public async UniTask DestroyAsync(CancellationToken token)
@@ -102,18 +98,15 @@ namespace Aplem.Common
             while (_pool.Count != 0)
             {
                 if (token.IsCancellationRequested)
-                {
                     return;
-                }
 
-                for (int i = 0; i < _destroyPerFrame; i++)
+                for (var i = 0; i < _destroyPerFrame; i++)
                 {
-                    if (!_pool.TryPop(out T item))
-                    {
+                    if (!_pool.TryPop(out var item))
                         return;
-                    }
                     Capacity--;
                 }
+
                 await UniTask.DelayFrame(1);
             }
 
@@ -124,6 +117,5 @@ namespace Aplem.Common
         {
             _pool.Clear();
         }
-
     }
 }

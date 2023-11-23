@@ -13,7 +13,6 @@ using UnityEditor;
 
 namespace Aplem.Common
 {
-
     public class VectorComparer : IComparer<Vector2>
     {
         public int Compare(Vector2 x, Vector2 y)
@@ -29,12 +28,10 @@ namespace Aplem.Common
     [DisplayName("Tap Composite")]
     public class TapComposite : InputBindingComposite<Vector2>
     {
-        [InputControl(layout = "Button")]
-        [UsedImplicitly]
+        [InputControl(layout = "Button")] [UsedImplicitly]
         public int Button;
 
-        [InputControl(layout = "Vector2")]
-        [UsedImplicitly]
+        [InputControl(layout = "Vector2")] [UsedImplicitly]
         public int Position;
 
 
