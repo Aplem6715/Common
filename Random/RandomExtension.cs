@@ -150,7 +150,7 @@ namespace Aplem.Common
         /// <param name="weights">id-重み辞書</param>
         /// <param name="random">Randomインスタンス</param>
         /// <returns>選択されたID</returns>
-        public static int ChoiceWeighted(this ref Random random, IReadOnlyDictionary<int, float> weights)
+        public static T ChoiceWeighted<T>(this ref Random random, IReadOnlyDictionary<T, float> weights)
         {
             float sum = 0;
             foreach (var pair in weights)
