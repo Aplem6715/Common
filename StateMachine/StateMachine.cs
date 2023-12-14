@@ -205,6 +205,7 @@ namespace IceMilkTea.StateMachine
         public event Func<Exception, bool> UnhandledException;
 
 
+        public event Action<State> OnStateChanged;
 
         /// <summary>
         /// ステートマシンが保持しているコンテキスト
@@ -689,6 +690,8 @@ namespace IceMilkTea.StateMachine
                     // Enter処理中であることを設定してEnterを呼ぶ
                     updateState = UpdateState.Enter;
                     currentState.Enter();
+                    
+                    OnStateChanged?.Invoke(currentState);
                 }
 
 
