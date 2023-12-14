@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
-using UnityEngine.EventSystems;
 
-namespace Aplem.Common.Extensions
+namespace Aplem.Common
 {
     public static class CameraExtensions
     {
