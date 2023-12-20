@@ -9,15 +9,17 @@ namespace Aplem.Common
 {
     public abstract class SingletonMono<T> : SerializedMonoBehaviour where T : MonoBehaviour
     {
-        protected static readonly ILogger _logger = LogManager.GetLogger(typeof(T).Name);
+        protected static ILogger _logger;
 
         private static T _instance;
+
+        [SerializeField] private Color _logColor = Color.clear;
 
         public static T Inst
         {
             get
             {
-                if (_instance == null)
+                if (_instance is null)
                 {
                     var t = typeof(T);
 
@@ -33,9 +35,15 @@ namespace Aplem.Common
         protected virtual void Awake()
         {
             if (_instance == null)
+            {
+                var color = _logColor == Color.clear ? null : $"#{ColorUtility.ToHtmlStringRGBA(_logColor)}";
+                _logger = LogManager.GetLogger(typeof(T).Name, color);
                 _instance = this as T;
+            }
             else
+            {
                 Destroy(this);
+            }
         }
     }
 }

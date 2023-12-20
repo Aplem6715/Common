@@ -94,9 +94,24 @@ namespace Aplem.Common
             return _loggerFactory.CreateLogger<T>();
         }
 
-        public static Microsoft.Extensions.Logging.ILogger GetLogger(string categoryName)
+        /// <summary>
+        /// カテゴリー名を指定してロガーを取得する
+        /// </summary>
+        /// <param name="categoryName">カテゴリー名</param>
+        /// <param name="color">色（https://docs.unity3d.com/Packages/com.unity.ugui@2.0/manual/StyledText.html）</param>
+        /// <returns>ロガー</returns>
+        public static Microsoft.Extensions.Logging.ILogger GetLogger(string categoryName, string color = null)
         {
-            return _loggerFactory.CreateLogger(categoryName);
+            if (color == null)
+            {
+                return _loggerFactory.CreateLogger(categoryName);
+            }
+            else
+            {
+                // categoryNameをUnityの色タグで囲む
+                var coloredCategoryName = ZString.Format("<b><color={0}>{1}</color></b>", color, categoryName);
+                return _loggerFactory.CreateLogger(coloredCategoryName);
+            }
         }
     }
 }

@@ -34,7 +34,7 @@ namespace Aplem.Data
         private static readonly int BufferKeySize = 16;
         private static readonly int BlockSize = 128;
         private static readonly int KeySize = 128;
-        private static ILogger _logger = LogManager.GetLogger("DataProcessor");
+        private static ILogger _logger = LogManager.GetLogger("DataProcessor", "purple");
 
         public const byte EncryptFlagBit = 1 << 0;
         public const byte CompressFlagBit = 1 << 1;

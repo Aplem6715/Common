@@ -21,7 +21,7 @@ namespace Aplem.Common
         private int _destroyPerFrame;
         private const int AsyncDestroyPerFrame = 10;
 
-        protected readonly ILogger _logger = LogManager.GetLogger(typeof(ObjectPool<T>).Name);
+        protected readonly ILogger _logger = LogManager.GetLogger(typeof(ObjectPool<T>).Name, "blue");
 
         public int Capacity
         {

@@ -13,7 +13,7 @@ namespace Aplem.Common
 
     public class MonoPool<T> : IPool where T : IPoolableMono
     {
-        private readonly ILogger _logger = LogManager.GetLogger(typeof(MonoPool<T>).Name);
+        private readonly ILogger _logger = LogManager.GetLogger(typeof(MonoPool<T>).Name, "blue");
         private Stack<T> _pool;
         private GameObject _motherPref;
         private Action<T> _instantiateProcessor;
