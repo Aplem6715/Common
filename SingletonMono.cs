@@ -19,14 +19,14 @@ namespace Aplem.Common
         {
             get
             {
-                if (_instance is null)
-                {
-                    var t = typeof(T);
+                //if (_instance is null)
+                //{
+                //    var t = typeof(T);
 
-                    _instance = (T)FindObjectOfType(t);
-                    if (_instance == null)
-                        _logger.ZLogError(t + " をアタッチしているGameObjectはありません");
-                }
+                //    _instance = (T)FindObjectOfType(t);
+                //    if (_instance == null)
+                //        _logger.ZLogError(t + " をアタッチしているGameObjectはありません");
+                //}
 
                 return _instance;
             }
