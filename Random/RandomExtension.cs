@@ -1,4 +1,5 @@
-﻿using Unity.Mathematics;
+﻿using UnityEngine;
+using Unity.Mathematics;
 using System.Collections.Generic;
 using System;
 using System.Linq;
@@ -29,6 +30,10 @@ namespace Aplem.Common
         /// <param name="std">標準偏差</param>
         public static float NextNormal(this ref Random rand, float mean, float std)
         {
+            if(Mathf.Approximately(std, 0))
+            {
+                return mean;
+            }
             //// 0~1の一様分布を12回重ねると分散が1(=偏差も1)になる
             //float ret = 0;
             //for (var i = 0; i < 12; i++)
@@ -38,7 +43,8 @@ namespace Aplem.Common
             // Box Muller
             float x = rand.NextFloat();
             float y = rand.NextFloat();
-            return math.sqrt(-2.0f * math.log(x)) * math.cos(2.0f * math.PI * y);
+            float normalRand = math.sqrt(-2.0f * math.log(x)) * math.cos(2.0f * math.PI * y);
+            return mean + normalRand * std;
         }
 
         /// <summary>
