@@ -10,22 +10,31 @@ using DG.Tweening;
 using Cysharp.Threading.Tasks;
 using UnityEngine.AddressableAssets;
 using System.Threading;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace Aplem.Common.UI
 {
     public class LazyImage : Image
     {
         [SerializeField] private IView _loadingView;
+        private CancellationTokenSource _prevTokenSource;
 
-        public async UniTask SetSpriteAsync(string spriteAddr, CancellationToken token)
+        public async UniTask SetSpriteAsync(string spriteAddr)
         {
+            if(_prevTokenSource != null)
+            {
+                _prevTokenSource.Cancel();
+            }
+            _prevTokenSource = new CancellationTokenSource();
+
             this.enabled = false;
             _loadingView.Show();
             {
-                var loadedSprite = await Addressables.LoadAssetAsync<Sprite>(spriteAddr).ToUniTask(cancellationToken: token);
-                if (!token.IsCancellationRequested)
+                var handle = Addressables.LoadAssetAsync<Sprite>(spriteAddr);
+                await handle.ToUniTask(cancellationToken: _prevTokenSource.Token);
+                if (handle.Status == AsyncOperationStatus.Succeeded)
                 {
-                    this.sprite = loadedSprite;
+                    this.sprite = handle.Result;
                 }
             }
             _loadingView.Hide();
