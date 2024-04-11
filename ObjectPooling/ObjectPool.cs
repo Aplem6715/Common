@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
@@ -17,6 +18,7 @@ namespace Aplem.Common
         private int _capacity;
 
         private Stack<T> _pool;
+        private Func<T> _createFunc;
 
         private int _destroyPerFrame;
         private const int AsyncDestroyPerFrame = 10;
@@ -37,13 +39,24 @@ namespace Aplem.Common
         {
         }
 
-        public ObjectPool(int capacity, int destroyPerFrame = AsyncDestroyPerFrame)
+        public ObjectPool(int capacity, int destroyPerFrame = AsyncDestroyPerFrame, Func<T> createFunc = null)
         {
+            Capacity = capacity;
             _destroyPerFrame = destroyPerFrame;
             _pool = new Stack<T>(capacity);
             for (var i = 0; i < capacity; i++)
+            {
                 _pool.Push(new T());
-            Capacity = capacity;
+            }
+
+            if (createFunc == null)
+            {
+                _createFunc = () => new T();
+            }
+            else
+            {
+                _createFunc = createFunc;
+            }
         }
 
         public void Warmup(int capacity)
@@ -54,7 +67,7 @@ namespace Aplem.Common
 
             for (var i = 0; i < gap; i++)
             {
-                _pool.Push(new T());
+                _pool.Push(_createFunc());
                 Capacity++;
             }
         }
@@ -64,7 +77,7 @@ namespace Aplem.Common
             T obj;
             if (_pool.Count == 0)
             {
-                obj = new T();
+                obj = _createFunc();
                 Capacity++;
             }
             else
