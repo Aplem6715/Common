@@ -14,6 +14,7 @@ namespace Aplem.Common
             _pool = pool;
         }
 
+        // ReSharper disable Unity.PerformanceAnalysis
         bool Return()
         {
             if (_pool == null)

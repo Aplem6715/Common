@@ -89,6 +89,8 @@ namespace Aplem.Common
             return comp;
         }
 
+        // この関数内でCreateの呼び出しは稀なので、パフォーマンスの問題はない
+        // ReSharper disable Unity.PerformanceAnalysis
         public virtual T Rent()
         {
             T obj;
@@ -107,10 +109,16 @@ namespace Aplem.Common
             var retObj = (T)obj;
 
             if (retObj is null)
+            {
                 _logger.ZLogError("returned object is not type of {0}", typeof(T));
+                return;
+            }
 
             if (_parent)
+            {
                 retObj.transform.SetParent(_parent);
+            }
+
             retObj.gameObject.SetActive(false);
             obj.IsPooling = true && !IsPendingDestroy;
             retObj.OnReturned();
@@ -124,7 +132,9 @@ namespace Aplem.Common
             {
 #if DEBUG
                 if (_pool.Contains(retObj))
+                {
                     Debug.LogError("重複Return", retObj.gameObject);
+                }
 #endif
                 _pool.Push(retObj);
             }
