@@ -31,7 +31,8 @@ namespace Aplem.Common
             private set
             {
                 _capacity = value;
-                Debug.Assert(ActiveCount >= 0);
+                if (_pool != null)
+                    Debug.Assert(ActiveCount >= 0);
             }
         }
 
