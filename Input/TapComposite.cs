@@ -24,7 +24,9 @@ namespace Aplem.Common
         }
     }
 
+#if UNITY_EDITOR
     [InitializeOnLoad]
+#endif
     [DisplayName("Tap Composite")]
     public class TapComposite : InputBindingComposite<Vector2>
     {
