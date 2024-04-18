@@ -13,17 +13,20 @@ namespace Aplem.Common
         {
             _pool = pool;
         }
+    }
 
+    public static class IPoolableExtension
+    {
         // ReSharper disable Unity.PerformanceAnalysis
-        bool Return()
+        public static bool Return(this IPoolable poolable)
         {
-            if (_pool == null)
+            if (poolable._pool == null)
             {
                 Debug.LogError("Pool is null");
                 return false;
             }
 
-            _pool.Return(this);
+            poolable._pool.Return(poolable);
             return true;
         }
     }
