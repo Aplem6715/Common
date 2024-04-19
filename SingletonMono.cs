@@ -13,7 +13,7 @@ namespace Aplem.Common
 
         private static T _instance;
 
-        [SerializeField] private Color _logColor = Color.clear;
+        [SerializeField] private Color _logColor = Color.white;
 
         public static T Inst
         {
@@ -36,7 +36,7 @@ namespace Aplem.Common
         {
             if (_instance == null)
             {
-                var color = _logColor == Color.clear ? null : $"#{ColorUtility.ToHtmlStringRGBA(_logColor)}";
+                var color = _logColor == Color.white ? null : $"#{ColorUtility.ToHtmlStringRGBA(_logColor)}";
                 _logger = LogManager.GetLogger(typeof(T).Name, color);
                 _instance = this as T;
             }
