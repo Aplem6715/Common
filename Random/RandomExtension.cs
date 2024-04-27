@@ -82,6 +82,11 @@ namespace Aplem.Common
                 (array[i], array[j]) = (array[j], array[i]);
             }
         }
+        
+        public static T Choice<T>(this ref Random random, IReadOnlyList<T> list)
+        {
+            return list[random.NextInt(list.Count)];
+        }
 
         /// <summary>
         /// 重み付きランダムでリストのインデックスを取得
