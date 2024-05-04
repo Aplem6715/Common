@@ -1,4 +1,5 @@
 ﻿using System;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Aplem.Common
@@ -20,7 +21,7 @@ namespace Aplem.Common
             }
         }
 
-        [SerializeField] private T _value;
+        [SerializeField, ReadOnly] private T _value;
 
         public Reactive(T defaultValue)
         {
