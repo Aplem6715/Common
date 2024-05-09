@@ -104,6 +104,7 @@ namespace Aplem.Common
             return obj;
         }
 
+        // ReSharper disable Unity.PerformanceAnalysis
         public virtual void Return(IPoolable obj)
         {
             var retObj = (T)obj;
