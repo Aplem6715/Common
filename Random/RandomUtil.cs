@@ -15,10 +15,10 @@ namespace Aplem.Common
 
         public RandomUtil()
         {
-            Reset();
+            SingletonInitialize();
         }
 
-        public override void Reset()
+        public override void SingletonInitialize()
         {
             _seedRand = new Random((uint)Environment.TickCount);
         }

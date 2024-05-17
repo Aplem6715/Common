@@ -11,7 +11,7 @@ namespace Aplem.Common
     
     public interface ISingleton
     {
-        public void Reset();
+        public void SingletonInitialize();
     }
 
     public static class SingletonCleaner
@@ -52,9 +52,9 @@ namespace Aplem.Common
         public void ResetInner()
         {
             Inst = new T();
-            Inst.Reset();
+            Inst.SingletonInitialize();
         }
 
-        public abstract void Reset();
+        public abstract void SingletonInitialize();
     }
 }
