@@ -34,7 +34,7 @@ namespace Aplem.Common
         /// [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         /// をつけてリセットが必要
         /// </summary>
-        protected abstract void Reset();
+        protected abstract void SingletonInitialize();    
 
         public virtual void OnBeforeSerialize()
         {

@@ -59,7 +59,7 @@ namespace Aplem.Common
             return _idMap.ElementAt(rand.NextInt(_idMap.Count)).Key;
         }
 
-        protected override void Reset()
+        protected override void SingletonInitialize()
         {
             _idMap = null;
             _masterTable = null;
