@@ -23,37 +23,13 @@ using UnityEngine.Scripting;
 
 namespace IceMilkTea.StateMachine
 {
-    /// <summary>
-    /// ステートマシンの更新処理中に発生した、未処理の例外をどう振る舞うかを表現した列挙型です
-    /// </summary>
-    public enum ImtStateMachineUnhandledExceptionMode
-    {
-        /// <summary>
-        /// Update関数内で発生した例外をそのまま例外として発生させます。
-        /// </summary>
-        ThrowException,
-
-        /// <summary>
-        /// OnUnhandledException ハンドラに転送されます。
-        /// </summary>
-        CatchException,
-
-        /// <summary>
-        /// 現在動作中ステートの Error() に例外が転送されます。
-        /// ただし、現在動作中ステートが存在しない場合は ThrowException と同等の振る舞いになります。
-        /// </summary>
-        CatchStateException,
-    }
-
-
-
     #region 標準ステートマシン基底実装
     /// <summary>
     /// コンテキストを持つことのできるステートマシンクラスです
     /// </summary>
     /// <typeparam name="TContext">このステートマシンが持つコンテキストの型</typeparam>
     /// <typeparam name="TEvent">ステートマシンへ送信するイベントの型</typeparam>
-    public class ImtStateMachine<TContext, TEvent>
+    public class ImtStateMachineFixedUpdate<TContext, TEvent>
     {
         #region ステートクラス本体と特別ステートクラスの定義
         /// <summary>
@@ -63,14 +39,14 @@ namespace IceMilkTea.StateMachine
         {
             // メンバ変数定義
             internal Dictionary<TEvent, State> transitionTable;
-            internal ImtStateMachine<TContext, TEvent> stateMachine;
+            internal ImtStateMachineFixedUpdate<TContext, TEvent> stateMachine;
 
 
 
             /// <summary>
             /// このステートが所属するステートマシン
             /// </summary>
-            protected ImtStateMachine<TContext, TEvent> StateMachine => stateMachine;
+            protected ImtStateMachineFixedUpdate<TContext, TEvent> StateMachine => stateMachine;
 
 
             /// <summary>
@@ -93,6 +69,10 @@ namespace IceMilkTea.StateMachine
             /// ステートを更新するときの処理を行います
             /// </summary>
             protected internal virtual void Update()
+            {
+            }
+            
+            protected internal virtual void FixedUpdate()
             {
             }
 
@@ -267,12 +247,12 @@ namespace IceMilkTea.StateMachine
 
 
         /// <summary>
-        /// ImtStateMachine のインスタンスを初期化します
+        /// ImtStateMachineFixedUpdate のインスタンスを初期化します
         /// </summary>
         /// <param name="context">このステートマシンが持つコンテキスト</param>
         /// <exception cref="ArgumentNullException">context が null です</exception>
         /// <exception cref="InvalidOperationException">ステートクラスのインスタンスの生成に失敗しました</exception>
-        public ImtStateMachine(TContext context)
+        public ImtStateMachineFixedUpdate(TContext context)
         {
             // 渡されたコンテキストがnullなら
             if (context == null)
@@ -707,6 +687,14 @@ namespace IceMilkTea.StateMachine
                 return;
             }
         }
+
+        public virtual void FixedUpdate()
+        {
+            if (Running)
+            {
+                currentState.Update();
+            }
+        }
         
         #endregion
 
@@ -846,26 +834,6 @@ namespace IceMilkTea.StateMachine
             return new TState();
         }
         #endregion
-    }
-    #endregion
-
-
-
-    #region 旧intイベント型ベースのステートマシン実装
-    /// <summary>
-    /// コンテキストを持つことのできるステートマシンクラスです
-    /// </summary>
-    /// <typeparam name="TContext">このステートマシンが持つコンテキストの型</typeparam>
-    public class ImtStateMachine<TContext> : ImtStateMachine<TContext, int>
-    {
-        /// <summary>
-        /// ImtStateMachine のインスタンスを初期化します
-        /// </summary>
-        /// <param name="context">このステートマシンが持つコンテキスト</param>
-        /// <exception cref="ArgumentNullException">context が null です</exception>
-        public ImtStateMachine(TContext context) : base(context)
-        {
-        }
     }
     #endregion
 }
