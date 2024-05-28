@@ -692,7 +692,7 @@ namespace IceMilkTea.StateMachine
         {
             if (Running)
             {
-                currentState.Update();
+                currentState.FixedUpdate();
             }
         }
         
