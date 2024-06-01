@@ -183,6 +183,27 @@ namespace Aplem.Common
 
             throw new InvalidOperationException("Unreachable");
         }
+        
+        /// <summary>
+        /// id-weightペアの辞書から重み付きランダムでIDを取得
+        /// </summary>
+        /// <param name="weights">id-重み辞書</param>
+        /// <param name="random">Randomインスタンス</param>
+        /// <param name="sum">重みの合計値</param>
+        /// <returns>選択されたID</returns>
+        public static T ChoiceWeightedWithCalculatedSum<T>(this ref Random random, IReadOnlyDictionary<T, float> weights, float sum)
+        {
+            var rand = random.NextFloat(sum);
+            sum = 0;
+            foreach (var pair in weights)
+            {
+                sum += pair.Value;
+                if (rand < sum)
+                    return pair.Key;
+            }
+
+            throw new InvalidOperationException("Unreachable");
+        }
 
         /// <summary>
         /// 合計値が指定した値になるように配列を埋める
