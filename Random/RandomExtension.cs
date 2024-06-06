@@ -83,6 +83,20 @@ namespace Aplem.Common
             }
         }
         
+        /// <summary>
+        /// リストをシャッフルする
+        /// </summary>
+        /// <param name="rand">random</param>
+        /// <param name="list">シャッフルする配列</param>
+        public static void Shuffle<T>(this ref Random rand, ref List<T> list)
+        {
+            for (var i = list.Count - 1; i > 0; i--)
+            {
+                var j = rand.NextInt(i + 1);
+                (list[i], list[j]) = (list[j], list[i]);
+            }
+        }
+        
         public static T Choice<T>(this ref Random random, IReadOnlyList<T> list)
         {
             return list[random.NextInt(list.Count)];
