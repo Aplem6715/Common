@@ -66,7 +66,7 @@ namespace Aplem.Data
             }
             catch (Exception e)
             {
-                _logger.ZLogError("{0}", e);
+                _logger.ZLogError($"{e}");
                 return null;
             }
         }

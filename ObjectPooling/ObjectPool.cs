@@ -96,7 +96,7 @@ namespace Aplem.Common
         {
             var retObj = obj as T;
             if (retObj is null)
-                _logger.ZLogError("returned object is not type of {0}", typeof(T));
+                _logger.ZLogError($"returned object is not type of {typeof(T)}");
 
             retObj.IsPooling = true && !IsPendingDestroy;
             retObj.OnReturned();

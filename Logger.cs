@@ -3,6 +3,7 @@ using Cysharp.Text;
 using Microsoft.Extensions.Logging;
 using UnityEngine;
 using ZLogger;
+using ZLogger.Unity;
 
 namespace Aplem.Common
 {
@@ -46,7 +47,7 @@ namespace Aplem.Common
             // Standard LoggerFactory does not work on IL2CPP,
             // But you can use ZLogger's UnityLoggerFactory instead,
             // it works on IL2CPP, all platforms(includes mobile).
-            _loggerFactory = UnityLoggerFactory.Create(builder =>
+            _loggerFactory = LoggerFactory.Create(builder =>
             {
                 builder.ClearProviders();
 
@@ -70,8 +71,11 @@ namespace Aplem.Common
                 // * Error with Exception -> LogException
                 builder.AddZLoggerUnityDebug(options =>
                 {
-                    options.PrefixFormatter = (writer, info) =>
-                        ZString.Utf8Format(writer, "【{0}】 ", info.CategoryName);
+                    options.UsePlainTextFormatter(formatter =>
+                    {
+                        formatter.SetPrefixFormatter($"【{0}】 ",
+                            (in MessageTemplate template, in LogInfo info) => template.Format(info.Category));
+                    });
                 });
 
                 // and other configuration(AddFileLog, etc...)

@@ -5,7 +5,6 @@ using UnityEngine;
 using ZLogger;
 using Aplem.Common;
 using TMPro;
-using Cysharp.Text;
 using Cysharp.Threading.Tasks;
 
 
@@ -22,7 +21,7 @@ namespace Aplem.Common
         public virtual async UniTask Open(Vector3 pos, int damage)
         {
             transform.position = pos;
-            _text.SetText(damage);
+            // _text.SetTextFormat(damage);
 
             await Play();
 

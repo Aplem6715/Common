@@ -47,7 +47,7 @@ namespace Aplem.Common
             Debug.Assert(_pools != null,
                 "DamagePopupのPrefabが設定されていません。\nダメージ表示を行う前にDamagePopManager.SetPrefsを実行してください");
             if (styleId < 0 || styleId >= _pools.Length)
-                _logger.ZLogError("未登録のダメージ表示スタイル id:{0}", styleId);
+                _logger.ZLogError($"未登録のダメージ表示スタイル id:{styleId}");
 
             var pop = _pools[styleId].Rent();
             pop.Open(pos + _spawnShift, damage).Forget();

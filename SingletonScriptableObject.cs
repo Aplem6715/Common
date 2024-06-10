@@ -18,7 +18,7 @@ namespace Aplem.Common
             get
             {
                 if (_instance == null)
-                    _logger.ZLogError("Not Initialized");
+                    _logger.ZLogError($"Not Initialized");
                 return _instance;
             }
         }

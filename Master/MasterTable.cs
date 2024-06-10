@@ -47,10 +47,10 @@ namespace Aplem.Common
         public MasterT GetMaster(int id)
         {
             if (_idMap == null)
-                _logger.ZLogError("テーブルがロードされていません");
+                _logger.ZLogError($"テーブルがロードされていません");
             if (_idMap.TryGetValue(id, out var master))
                 return master;
-            _logger.ZLogError("id:{} のレコードが見つかりません");
+            _logger.ZLogError($"id:{id} のレコードが見つかりません");
             return default;
         }
 
@@ -77,7 +77,7 @@ namespace Aplem.Common
             _dataName = typeof(T).Name.Replace("Table", "");
             if (!Directory.Exists(_enumSourceDir))
             {
-                _logger.ZLogError("ディレクトリが見つかりません\n[{0}]", _enumSourceDir);
+                _logger.ZLogError($"ディレクトリが見つかりません\n[{_enumSourceDir}]");
                 return;
             }
 
