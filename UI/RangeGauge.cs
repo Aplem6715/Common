@@ -28,6 +28,8 @@ namespace Aplem.Common.UI
         {
             Debug.Assert(min <= max);
 
+            min = Mathf.Max(0, min);
+            max = Mathf.Min(1, max);
             _leftSpacer.flexibleWidth = min;
             _rightSpacer.flexibleWidth = 1 - max;
             _gaugeLayout.flexibleWidth = max - min;
