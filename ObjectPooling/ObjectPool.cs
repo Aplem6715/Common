@@ -9,7 +9,7 @@ namespace Aplem.Common
 {
     using ILogger = Microsoft.Extensions.Logging.ILogger;
 
-    public class ObjectPool<T> : IPool where T : class, IPoolable, new()
+    public class ObjectPool<T> : IPool where T : class, IPoolable
     {
         public int PoolingCount => _pool.Count;
         public int ActiveCount => Capacity - PoolingCount;
@@ -35,28 +35,28 @@ namespace Aplem.Common
                     Debug.Assert(ActiveCount >= 0);
             }
         }
-
-        public ObjectPool() : this(0)
+        
+        /// <summary>
+        /// </summary>
+        /// <param name="createFunc">クラス生成するだけなら() => new Class()</param>
+        public ObjectPool(Func<T> createFunc) : this(0, createFunc)
         {
         }
 
-        public ObjectPool(int capacity, int destroyPerFrame = AsyncDestroyPerFrame, Func<T> createFunc = null)
+        /// <summary>
+        /// </summary>
+        /// <param name="capacity"></param>
+        /// <param name="createFunc">クラス生成するだけなら() => new Class()</param>
+        /// <param name="destroyPerFrame"></param>
+        public ObjectPool(int capacity, Func<T> createFunc, int destroyPerFrame = AsyncDestroyPerFrame)
         {
             Capacity = capacity;
             _destroyPerFrame = destroyPerFrame;
+            _createFunc = createFunc;
             _pool = new Stack<T>(capacity);
             for (var i = 0; i < capacity; i++)
             {
-                _pool.Push(new T());
-            }
-
-            if (createFunc == null)
-            {
-                _createFunc = () => new T();
-            }
-            else
-            {
-                _createFunc = createFunc;
+                _pool.Push(_createFunc());
             }
         }
 
@@ -94,9 +94,11 @@ namespace Aplem.Common
 
         public void Return(IPoolable obj)
         {
-            var retObj = obj as T;
-            if (retObj is null)
+            if (obj is not T retObj)
+            {
                 _logger.ZLogError($"returned object is not type of {typeof(T)}");
+                return;
+            }
 
             retObj.IsPooling = true && !IsPendingDestroy;
             retObj.OnReturned();
@@ -121,7 +123,7 @@ namespace Aplem.Common
                     Capacity--;
                 }
 
-                await UniTask.DelayFrame(1);
+                await UniTask.DelayFrame(1, cancellationToken: token);
             }
 
             await ((IPool)this).WaitUntilReturnAll(token);
