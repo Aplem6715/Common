@@ -21,7 +21,7 @@ namespace Aplem.Common
         public virtual async UniTask Open(Vector3 pos, int damage)
         {
             transform.position = pos;
-            // _text.SetTextFormat(damage);
+            _text.SetText($"{damage}");
 
             await Play();
 
