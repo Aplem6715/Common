@@ -3,13 +3,14 @@
 // </auto-generated>
 
 using Sirenix.OdinInspector;
+using Sirenix.Utilities;
 using System;
 using UnityEngine;
 
 namespace Aplem.Data
 {
     [Serializable]
-    public class EnumParam<T>
+    public struct EnumParam<T>
 #if UNITY_EDITOR
         : ISerializationCallbackReceiver
 #endif
@@ -17,8 +18,9 @@ namespace Aplem.Data
     {
         [SerializeField, OnValueChanged("OnEnumChanged", InvokeOnInitialize = false)]
         private T _value;
+        public T Value => _value;
 #if UNITY_EDITOR
-        [SerializeField, ReadOnly] private string _labelStr;
+        [SerializeField, ReadOnly] private string _enumStr;
 #endif
 
 
@@ -30,6 +32,17 @@ namespace Aplem.Data
 
         // 以下 Editor Only
 #if UNITY_EDITOR
+        public void SetLabel(T value)
+        {
+            _value = value;
+            _enumStr = _value.ToString();
+        }
+
+        public void SetStr(string enumStr)
+        {
+            _enumStr = enumStr;
+        }
+
         public void OnAfterDeserialize()
         {
             Fix();
@@ -42,25 +55,32 @@ namespace Aplem.Data
 
         private void Fix()
         {
-            if (_value.ToString() != _labelStr)
+            // ラベル名が空の場合は無視
+            if(_enumStr.IsNullOrWhitespace())
+            {
+                SetLabel(default(T));
+                return;
+            }
+
+            if (_value.ToString() != _enumStr)
             {
                 try
                 {
                     var prev = _value;
-                    _value = (T)Enum.Parse<T>(_labelStr);
-                    Debug.LogFormat("Fix Label name:{0:s} before:{1:d} after:{2:d}", _labelStr, prev, _value);
+                    _value = (T)Enum.Parse<T>(_enumStr);
+                    Debug.LogFormat("EnumParamの値が保存された文字列と異なるため文字列を元に復元しました。\nstr:{0:s} beforeNo:{1:d} afterNo:{2:d}", _enumStr, prev, _value);
                 }
                 catch (ArgumentException ex)
                 {
-                    Debug.LogError($"シリアライズされたEnumから以前までのEnum名:{_labelStr}のデータが削除されました。\n応急処置としてdefault={default(T)}を設定します。\n{ex}");
-                    _value = default(T);
+                    Debug.LogError($"シリアライズされたEnumから以前までのEnum名:[{_enumStr}] (現在のEnum名:{_value.ToString()})のデータが削除されました。\n応急処置としてdefault={default(T)}を設定します。\n{ex}");
+                    SetLabel(default(T));
                 }
             }
         }
 
         private void OnEnumChanged()
         {
-            _labelStr = _value.ToString();
+            _enumStr = _value.ToString();
         }
 #endif
     }
