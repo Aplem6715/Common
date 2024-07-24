@@ -1,3 +1,4 @@
+using Sirenix.OdinInspector;
 using System;
 using UnityEngine;
 
@@ -21,13 +22,14 @@ namespace Aplem.Common
     /// ※dtが大きくなった際，1フレームで最大1回の呼び出しになってしまう点に注意<br/>
     /// 　この場合，次のフレームでも呼び出される。
     /// </summary>
+    [Serializable]
     public class Timer
     {
         public bool IsActive { get; private set; }
 
-        private float _timer;
-        private float _timeMax;
-        private TimerType _type;
+        [ShowInInspector] private float _timer;
+        [ShowInInspector] private float _timeMax;
+        [ShowInInspector, ReadOnly] private TimerType _type;
 
         public Timer(float time, TimerType type, bool activeOnInit=true)
         {
