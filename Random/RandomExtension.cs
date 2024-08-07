@@ -3,6 +3,7 @@ using Unity.Mathematics;
 using System.Collections.Generic;
 using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace Aplem.Common
 {
@@ -20,6 +21,24 @@ namespace Aplem.Common
             // NextUIntをシードにする。NextUIntはState-1を返すので
             // 元のRandom構造体とは別Stateになる。
             return new Random(rand.NextUInt());
+        }
+
+        /// <summary>
+        /// 重ね掛けした乱数生成
+        /// </summary>
+        /// <param name="min">乱数の最小値</param>
+        /// <param name="max">乱数の最大値</param>
+        /// <param name="numDuplicate">何回重ねるか</param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float NextDuplicated(this ref Random rand, float min, float max, int numDuplicate)
+        {
+            var result = rand.NextFloat();
+            for (var i = 1; i < numDuplicate; i++)
+            {
+                result *= rand.NextFloat();
+            }
+            return result * (max - min) + min;
         }
 
         /// <summary>
